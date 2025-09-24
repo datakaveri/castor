@@ -88,11 +88,13 @@ public class DefaultCastorInterVcpClient implements CastorInterVcpClient {
 
     try {
       for (CastorServiceUri serviceUri : serviceUris) {
+          System.out.println("Making Inter VCP call, POST call to share reservation" + serviceUri.toString());
         log.debug("\twith {}", serviceUri.toString());
         CsResponseEntity<String, String> response =
             csHttpClient.postForEntity(
                 serviceUri.getInterVcpReservationUri(), reservation, String.class);
         if (response.isFailure()) {
+            System.out.println("Failed to share reservation with slave " + serviceUri.toString() + ": " + response.getError());
           log.debug(
               "Slave ({}) returned failure for shared reservation: {}",
               serviceUri,
@@ -111,7 +113,8 @@ public class DefaultCastorInterVcpClient implements CastorInterVcpClient {
     try {
       for (CastorServiceUri serviceUri : serviceUris) {
         URI requestUri = serviceUri.getInterVcpUpdateReservationUri(reservationId);
-        log.debug("Sending reservation update for reservation #{}: {}", reservationId, status);
+        System.out.println("Sending reservation update to " + reservationId + " at " + requestUri + " to status " + status);
+        log.debug("Sending reservation update for {} to {}", reservationId, requestUri);
         csHttpClient.put(requestUri, status);
       }
     } catch (CsHttpClientException chce) {

@@ -30,13 +30,16 @@ final class UnlockReservationSupplier implements Supplier<Reservation> {
    */
   @Override
   public Reservation get() {
+      System.out.println("Unlocking reservation #" + reservation.getReservationId());
     log.debug("updating reservation {}", reservation.getReservationId());
     reservation.setStatus(ActivationStatus.UNLOCKED);
     castorInterVcpClient.updateReservationStatus(
         reservation.getReservationId(), reservation.getStatus());
+    System.out.println("Reservation #" + reservation.getReservationId() + " unlocked.");
     log.debug("update distributed");
     reservationCachingService.updateReservation(
         reservation.getReservationId(), reservation.getStatus());
+    System.out.println("Reservation #" + reservation.getReservationId() + " applied locally.");
     log.debug("update applied locally");
     return reservation;
   }

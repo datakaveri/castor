@@ -92,6 +92,7 @@ public class ReservationCachingService {
    */
   @Transactional
   public void keepReservation(Reservation reservation) {
+      System.out.println("Keeping reservation in cache with ID: " + reservation.getReservationId());
     log.debug("persisting reservation {}", reservation);
     ValueOperations<String, Object> ops = redisTemplate.opsForValue();
     if (ops.get(cachePrefix + reservation.getReservationId()) == null) {
@@ -200,10 +201,12 @@ public class ReservationCachingService {
    */
   @Transactional
   public Reservation createReservation(String reservationId, TupleType tupleType, long count) {
+      System.out.println("Creating reservation with ID as master: " + reservationId);
     if (!dedicatedTransactionServiceOptional.isPresent()
         || !castorInterVcpClientOptional.isPresent()) {
       throw new CastorServiceException(NOT_DECLARED_TO_BE_THE_MASTER_EXCEPTION_MSG);
     }
+    System.out.println("Dependencies present, starting CreateReservationSupplier...");
     Reservation reservation;
     try {
       reservation =
@@ -217,16 +220,20 @@ public class ReservationCachingService {
                       reservationId,
                       tupleType,
                       count));
+        System.out.println("CreateReservationSupplier DONE");
       keepReservation(reservation);
+        System.out.println("keepReservation DONE");
       reservation =
           dedicatedTransactionServiceOptional
               .get()
               .runAsNewTransaction(
                   new UnlockReservationSupplier(
                       castorInterVcpClientOptional.get(), this, reservation));
+        System.out.println("UnlockReservationSupplier DONE");
     } catch (CastorClientException cce) {
       throw new CastorServiceException(FAILED_CREATE_RESERVATION_EXCEPTION_MSG, cce);
     }
+    System.out.println("Reservation created: " + reservation.getReservationId());
     return reservation;
   }
 
@@ -247,6 +254,10 @@ public class ReservationCachingService {
   @Transactional(readOnly = true)
   public Reservation getReservationWithRetry(
       String reservationId, TupleType tupleType, long numberOfTuples) {
+      System.out.println("Trying to get reservation with ID as slave: " + reservationId);
+      System.out.println("Retry delay (ms): " + slaveServiceProperties.getRetryDelay());
+      long resTimeout = 100000;
+        System.out.println(" Setting waitForReservation Timeout (ms): " + resTimeout);
     Reservation reservation = null;
     WaitForReservationCallable waitForReservationCallable =
         new WaitForReservationCallable(
@@ -255,7 +266,7 @@ public class ReservationCachingService {
       reservation =
           executorService
               .submit(waitForReservationCallable)
-              .get(slaveServiceProperties.getWaitForReservationTimeout(), TimeUnit.MILLISECONDS);
+              .get(resTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException ie) {
       waitForReservationCallable.cancel();
       Thread.currentThread().interrupt();

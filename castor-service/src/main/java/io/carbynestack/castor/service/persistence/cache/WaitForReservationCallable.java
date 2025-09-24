@@ -46,6 +46,7 @@ public class WaitForReservationCallable implements Callable<Reservation>, Cancel
         }
         TimeUnit.MILLISECONDS.sleep(retryDelay);
       } catch (InterruptedException ie) {
+          System.out.println("Get Reservation Thread interrupted.");
         log.debug("Get Reservation Thread interrupted.", ie);
         Thread.currentThread().interrupt();
       }

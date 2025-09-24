@@ -50,10 +50,12 @@ public final class CreateReservationSupplier implements Supplier<Reservation> {
   public Reservation get() {
     List<ReservationElement> reservationElements = composeElements(tupleType, count, reservationId);
     log.debug("Reservation composed.");
+    System.out.println("Reservation composed.");
     Reservation reservation = new Reservation(reservationId, tupleType, reservationElements);
     if (!castorInterVcpClient.shareReservation(reservation)) {
       throw new CastorServiceException(SHARING_RESERVATION_FAILED_EXCEPTION_MSG);
     }
+    System.out.println("Reservation successfully shared with all slaves.");
     log.debug("Reservation successfully shared with all slaves.");
     return reservation;
   }
@@ -100,6 +102,7 @@ public final class CreateReservationSupplier implements Supplier<Reservation> {
         throw new CastorServiceException(FAILED_RESERVE_TUPLES_EXCEPTION_MSG, e);
       }
     }
+    System.out.println("Composed reservation of " + numberOfTuples + " " + tupleType + ": " + reservationElements);
     log.debug("Composed reservation of {} {}: {}.", numberOfTuples, tupleType, reservationElements);
     return reservationElements;
   }

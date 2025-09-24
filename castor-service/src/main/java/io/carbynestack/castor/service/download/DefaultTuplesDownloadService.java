@@ -59,23 +59,29 @@ public class DefaultTuplesDownloadService implements TuplesDownloadService {
   @Override
   public <T extends Tuple<T, F>, F extends Field> TupleList<T, F> getTupleList(
       Class<T> tupleCls, F field, long count, UUID requestId) {
+      System.out.println("In getTuples in Castor service");
     TupleType tupleType = TupleType.findTupleType(tupleCls, field);
     String reservationId = requestId + "_" + tupleType;
+    System.out.println("Reservation ID is assigned: " + reservationId);
     Reservation reservation;
     if (castorServiceProperties.isMaster()) {
+        System.out.println("Running get tuples as master, now checking for existing reservation in Redis");
       reservation =
           reservationCachingService.getUnlockedReservation(reservationId, tupleType, count);
       if (reservation == null) {
+          System.out.println("Creating new reservation as none exists");
         reservation = reservationCachingService.createReservation(reservationId, tupleType, count);
         log.debug("Reservation successfully activated on all slaves.");
       }
     } else {
+        System.out.println("Running get tuples as slave, trying to get existing reservation from Redis");
       reservation =
           reservationCachingService.getReservationWithRetry(reservationId, tupleType, count);
     }
     TupleList<T, F> result = consumeReservation(tupleCls, field, reservation);
     deleteReservedFragments(reservation);
     reservationCachingService.forgetReservation(reservationId);
+    System.out.println("Tuples successfully retrieved and reservation deleted");
     return result;
   }
 

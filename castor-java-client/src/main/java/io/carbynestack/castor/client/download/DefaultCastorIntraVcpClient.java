@@ -90,6 +90,7 @@ public class DefaultCastorIntraVcpClient implements CastorIntraVcpClient {
 
   @Override
   public TupleList downloadTupleShares(UUID requestId, TupleType tupleType, long count) {
+      System.out.println("Download Tuple Shares called in Castor Client. Performing a GET request to intra vcp castor service");
     try {
       return csHttpClient
           .getForEntity(

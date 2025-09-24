@@ -28,6 +28,7 @@ public class ReservationRestController {
 
   @PostMapping
   public ResponseEntity<String> reserveTuples(@RequestBody Reservation reservation) {
+      System.out.println("POST request from castor client to reserve tuples with reservationId " + reservation.getReservationId());
     reservation.setStatus(ActivationStatus.LOCKED);
     reservationCachingService.keepAndApplyReservation(reservation);
     return new ResponseEntity<>(HttpStatus.CREATED);
@@ -36,6 +37,7 @@ public class ReservationRestController {
   @PutMapping(path = "/{" + DOWNLOAD_REQUEST_ID_PARAMETER + "}")
   public ResponseEntity<String> updateReservationStatus(
       @PathVariable String reservationId, @RequestBody ActivationStatus status) {
+      System.out.println("PUT request from castor client to update reservation #" + reservationId + " to status " + status);
     log.debug("Received update for reservation #{} to status {}", reservationId, status);
     reservationCachingService.updateReservation(reservationId, status);
     return new ResponseEntity<>(HttpStatus.OK);

@@ -36,6 +36,7 @@ public class TupleChunksController {
   @PutMapping(path = "/{" + TUPLE_CHUNK_ID_PARAMETER + "}")
   public ResponseEntity<String> activateTupleChunk(
       @PathVariable(value = TUPLE_CHUNK_ID_PARAMETER) UUID chunkId) {
+      System.out.println("PUT request from castor client to activate tuple chunk with id " + chunkId);
     Assert.notNull(chunkId, "Chunk identifier must not be omitted");
     this.fragmentStorageService.activateFragmentsForTupleChunk(chunkId);
     return new ResponseEntity<>(HttpStatus.OK);

@@ -41,6 +41,7 @@ public class TuplesController {
       @RequestParam(value = DOWNLOAD_TUPLE_TYPE_PARAMETER) String type,
       @RequestParam(value = DOWNLOAD_COUNT_PARAMETER) long count,
       @RequestParam(value = DOWNLOAD_REQUEST_ID_PARAMETER) UUID requestId) {
+      System.out.println("GET request from castor client to get tuples of type " + type + " with count " + count + " and requestId " + requestId);
     Assert.notNull(requestId, "Request identifier must not be omitted");
     isTrue(count > 0, "The number of requested Multiplication Triples has to be 1 or greater.");
     TupleType tupleType = TupleType.valueOf(type);
