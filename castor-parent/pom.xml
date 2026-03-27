@@ -59,7 +59,7 @@
         <cs-java-client.version>0.2.0</cs-java-client.version>
 
         <!-- external dependency versions -->
-        <assertj.version>3.24.2</assertj.version>
+        <assertj.version>3.27.7</assertj.version>
         <commons-io.version>2.11.0</commons-io.version>
         <jackson.version>2.14.2</jackson.version>
         <junit-jupiter.version>5.9.2</junit-jupiter.version>
